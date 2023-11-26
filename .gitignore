@@ -1,0 +1,8 @@
+.cache
+*.o
+debug
+release
+test_bin
+compile_commands.json
+
+*.swp
