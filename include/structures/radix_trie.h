@@ -456,7 +456,6 @@ void data::RadixTrie<char, int>::print() {
             } else {
                 printf(":(null)");
             }
-            // printf(":%d", node->val.value_or());
             printf(") ");
 
             for (size_t j = 0; j < node->children.size(); j++) {

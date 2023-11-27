@@ -15,7 +15,9 @@ HEADERS = \
 		${INC_DIR}/structures/trie.h \
 		${INC_DIR}/structures/radix_trie.h \
 		${INC_DIR}/structures/radix_trie_iterator.h \
-		${INC_DIR}/structures/radix_trie_node.h
+		${INC_DIR}/structures/radix_trie_node.h \
+		${INC_DIR}/structures/sorted_vec.h \
+		${INC_DIR}/traits.h
 
 OBJS = \
 		${SRC_DIR}/main.o 
@@ -29,7 +31,8 @@ TEST_HEADERS = \
 TEST_OBJS = \
 		${TEST_SRC_DIR}/main.o \
 		${TEST_SRC_DIR}/trie.o \
-		${TEST_SRC_DIR}/radix_trie.o
+		${TEST_SRC_DIR}/radix_trie.o \
+		${TEST_SRC_DIR}/sorted_vec.o
 
 .PHONY: clean
 
@@ -49,7 +52,7 @@ test: ${OBJS_NO_MAIN} ${TEST_OBJS}
 	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
 
 memtest: ${OBJS_NO_MAIN} ${TEST_OBJS}
-	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && valgrind ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
+	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && valgrind --track-origins=yes ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
 
 invtest: ${OBJS_NO_MAIN} ${TEST_OBJS}
 	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
