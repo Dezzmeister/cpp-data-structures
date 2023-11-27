@@ -59,6 +59,8 @@ namespace data {
 
             void put(const T item);
 
+            T& operator[](size_t i);
+
             const T& operator[](size_t i) const;
 
             T get(size_t i) const;
@@ -202,6 +204,11 @@ void data::SortedVec<T>::put(const T item) {
 
         this->items = new_items;
     }
+}
+
+template <data::PartialOrd T>
+T& data::SortedVec<T>::operator[](size_t i) {
+    return this->items[i];
 }
 
 template <data::PartialOrd T>

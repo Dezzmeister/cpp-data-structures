@@ -4,6 +4,8 @@
 #include <optional>
 #include <vector>
 
+#include "sorted_vec.h"
+
 namespace data {
     template <typename K, typename V>
     struct RadixTrieNode {
@@ -11,7 +13,7 @@ namespace data {
         std::optional<V> val;
         // The parent is not owned by the node
         struct RadixTrieNode<K, V> * parent;
-        std::vector<struct RadixTrieNode<K, V> *> children;
+        SortedVec<struct RadixTrieNode<K, V> *> children;
 
         RadixTrieNode(std::vector<K> key, std::optional<V> val, struct RadixTrieNode<K, V> * parent);
 
@@ -28,7 +30,7 @@ namespace data {
 
 template <typename K, typename V>
 data::RadixTrieNode<K, V>::RadixTrieNode(std::vector<K> key, std::optional<V> val, RadixTrieNode<K, V> * parent)
-    : key(key), val(val), parent(parent), children(std::vector<RadixTrieNode<K, V> *>()) {}
+    : key(key), val(val), parent(parent), children(SortedVec<RadixTrieNode<K, V> *>()) {}
 
 template <typename K, typename V>
 data::RadixTrieNode<K, V>::~RadixTrieNode() {

@@ -10,6 +10,7 @@
 
 #include "radix_trie_iterator.h"
 #include "radix_trie_node.h"
+#include "sorted_vec.h"
 
 namespace data {
     template <typename K, typename V>
@@ -17,7 +18,7 @@ namespace data {
         private:
             typedef std::pair<std::vector<K>, const V *> entry_type;
 
-            std::vector<RadixTrieNode<K, V> *> nodes;
+            SortedVec<RadixTrieNode<K, V> *> nodes;
 
             void split_and_insert(RadixTrieNode<K, V> * node, std::vector<K> key, const V value, const size_t prefix_len, const size_t char_count);
 
@@ -25,9 +26,9 @@ namespace data {
 
             void try_delete_node(RadixTrieNode<K, V> * node);
 
-            size_t depth_rec(const std::vector<RadixTrieNode<K, V> *> * nodes) const;
+            size_t depth_rec(const SortedVec<RadixTrieNode<K, V> *> * nodes) const;
 
-            std::vector<entry_type> entries_rec(const std::vector<K> &key, const std::vector<RadixTrieNode<K, V> *> &nodes) const;
+            std::vector<entry_type> entries_rec(const std::vector<K> &key, const SortedVec<RadixTrieNode<K, V> *> &nodes) const;
 
         public:
             RadixTrie();
@@ -53,7 +54,7 @@ namespace data {
 #ifdef TEST
             void print();
 
-            std::vector<RadixTrieNode<K, V> *>& get_nodes();
+            SortedVec<RadixTrieNode<K, V> *>& get_nodes();
 
             RadixTrieNode<K, V> * get_node(const std::vector<K> key);
 #endif
@@ -62,7 +63,7 @@ namespace data {
 
 
 template <typename K, typename V>
-data::RadixTrie<K, V>::RadixTrie() : nodes(std::vector<RadixTrieNode<K, V> *>()) {}
+data::RadixTrie<K, V>::RadixTrie() : nodes(SortedVec<RadixTrieNode<K, V> *>()) {}
 
 template <typename K, typename V>
 data::RadixTrie<K, V>::~RadixTrie() {
@@ -82,9 +83,9 @@ template <typename K, typename V>
 void data::RadixTrie<K, V>::split_and_insert(RadixTrieNode<K, V> * node, std::vector<K> key, const V value, const size_t prefix_len, const size_t char_count)  {
     std::vector<K> other_key_prev = std::vector<K>(node->key.begin(), node->key.begin() + prefix_len);
     RadixTrieNode<K, V> * other_node_prev = new RadixTrieNode<K, V>(other_key_prev, std::nullopt, node->parent);
-    other_node_prev->children.push_back(node);
+    other_node_prev->children.put(node);
 
-    std::vector<RadixTrieNode<K, V> *> * siblings;
+    SortedVec<RadixTrieNode<K, V> *> * siblings;
 
     if (other_node_prev->parent) {
         siblings = &other_node_prev->parent->children;
@@ -106,7 +107,7 @@ void data::RadixTrie<K, V>::split_and_insert(RadixTrieNode<K, V> * node, std::ve
         other_node_prev->val = std::optional(value);
     } else {
         RadixTrieNode<K, V> * key_node = new RadixTrieNode<K, V>(std::vector<K>(key.begin() + char_count, key.end()), std::optional(value), other_node_prev);
-        other_node_prev->children.push_back(key_node);
+        other_node_prev->children.put(key_node);
     }
 }
 
@@ -115,7 +116,7 @@ std::optional<V> data::RadixTrie<K, V>::put(const std::vector<K> key, const V va
     size_t char_count = 0;
 
     RadixTrieNode<K, V> * curr_node = nullptr;
-    std::vector<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
+    SortedVec<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
     bool found_node = true;
 
     while (found_node) {
@@ -145,7 +146,7 @@ std::optional<V> data::RadixTrie<K, V>::put(const std::vector<K> key, const V va
                 if (prefix_len == node->key.size()) {
                     // add new node as child
                     RadixTrieNode<K, V> * new_node = new RadixTrieNode<K, V>(std::vector<K>(key.begin() + char_count, key.end()), std::optional(value), node);
-                    node->children.push_back(new_node);
+                    node->children.put(new_node);
                     return std::nullopt;
                 } else {
                     // split node, make branch
@@ -178,9 +179,9 @@ std::optional<V> data::RadixTrie<K, V>::put(const std::vector<K> key, const V va
 
     RadixTrieNode<K, V> * key_node = new RadixTrieNode<K, V>(std::vector<K>(key.begin() + char_count, key.end()), std::optional(value), curr_node);
     if (curr_node) {
-        curr_node->children.push_back(key_node);
+        curr_node->children.put(key_node);
     } else {
-        this->nodes.push_back(key_node);
+        this->nodes.put(key_node);
     }
 
     return std::nullopt;
@@ -191,7 +192,7 @@ std::optional<V> data::RadixTrie<K, V>::get(const std::vector<K> key) {
     size_t char_count = 0;
 
     RadixTrieNode<K, V> * curr_node = nullptr;
-    std::vector<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
+    SortedVec<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
     bool found_node = true;
 
     while (found_node) {
@@ -225,7 +226,7 @@ std::optional<V> data::RadixTrie<K, V>::del(const std::vector<K> key) {
     size_t char_count = 0;
 
     RadixTrieNode<K, V> * curr_node = nullptr;
-    std::vector<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
+    SortedVec<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
     bool found_node = true;
 
     while (found_node) {
@@ -260,7 +261,7 @@ std::optional<V> data::RadixTrie<K, V>::del(const std::vector<K> key) {
 
 template <typename K, typename V>
 void data::RadixTrie<K, V>::delete_node(RadixTrieNode<K, V> * node) {
-    std::vector<RadixTrieNode<K, V> *> * siblings;
+    SortedVec<RadixTrieNode<K, V> *> * siblings;
 
     if (node->parent) {
         siblings = &node->parent->children;
@@ -272,7 +273,7 @@ void data::RadixTrie<K, V>::delete_node(RadixTrieNode<K, V> * node) {
         RadixTrieNode<K, V> * sibling = (*siblings)[i];
 
         if (sibling == node) {
-            siblings->erase(siblings->begin() + i);
+            siblings->del(i);
             break;
         }
     }
@@ -301,7 +302,7 @@ void data::RadixTrie<K, V>::try_delete_node(RadixTrieNode<K, V> * node) {
 }
 
 template <typename K, typename V>
-size_t data::RadixTrie<K, V>::depth_rec(const std::vector<RadixTrieNode<K, V> *> * nodes) const {
+size_t data::RadixTrie<K, V>::depth_rec(const SortedVec<RadixTrieNode<K, V> *> * nodes) const {
     size_t max = 0;
 
     for (size_t i = 0; i < nodes->size(); i++) {
@@ -321,7 +322,7 @@ size_t data::RadixTrie<K, V>::depth() const {
 }
 
 template <typename K, typename V>
-std::vector<typename data::RadixTrie<K, V>::entry_type> data::RadixTrie<K, V>::entries_rec(const std::vector<K> &key, const std::vector<RadixTrieNode<K, V> *> &nodes) const {
+std::vector<typename data::RadixTrie<K, V>::entry_type> data::RadixTrie<K, V>::entries_rec(const std::vector<K> &key, const SortedVec<RadixTrieNode<K, V> *> &nodes) const {
     std::vector<entry_type> out;
 
     for (size_t i = 0; i < nodes.size(); i++) {
@@ -374,10 +375,10 @@ data::RadixTrieIterator<K, V> data::RadixTrie<K, V>::end() {
         return RadixTrieIterator<K, V>(&this->nodes, nullptr, true);
     }
 
-    RadixTrieNode<K, V> * node = this->nodes.back();
+    RadixTrieNode<K, V> * node = this->nodes[this->nodes.size() - 1];
 
     while (node->children.size()) {
-        node = node->children.back();
+        node = node->children[node->children.size() - 1];
     }
 
     return RadixTrieIterator<K, V>(&this->nodes, node, true);
@@ -388,7 +389,7 @@ std::vector<typename data::RadixTrie<K, V>::entry_type> data::RadixTrie<K, V>::e
     size_t char_count = 0;
 
     RadixTrieNode<K, V> * curr_node = nullptr;
-    const std::vector<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
+    const SortedVec<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
     bool found_node = true;
 
     while (found_node) {
@@ -459,7 +460,7 @@ void data::RadixTrie<char, int>::print() {
             printf(") ");
 
             for (size_t j = 0; j < node->children.size(); j++) {
-                buf.push(node->children[j]);
+                buf.push(node->children[i]);
             }
         }
         printf("\n");
@@ -476,7 +477,7 @@ void data::RadixTrie<K, V>::print() {
 }
 
 template <typename K, typename V>
-std::vector<data::RadixTrieNode<K, V> *>& data::RadixTrie<K, V>::get_nodes() {
+data::SortedVec<data::RadixTrieNode<K, V> *>& data::RadixTrie<K, V>::get_nodes() {
     return this->nodes;
 }
 
@@ -485,7 +486,7 @@ data::RadixTrieNode<K, V> * data::RadixTrie<K, V>::get_node(std::vector<K> key) 
     size_t char_count = 0;
 
     RadixTrieNode<K, V> * curr_node = nullptr;
-    std::vector<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
+    SortedVec<RadixTrieNode<K, V> *> * curr_nodes = &this->nodes;
     bool found_node = true;
 
     while (found_node) {

@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "radix_trie_node.h"
+#include "sorted_vec.h"
 
 namespace data {
     /**
@@ -19,7 +20,7 @@ namespace data {
     template <typename K, typename V>
     class RadixTrieIterator {
         private:
-            std::vector<RadixTrieNode<K, V> *> * top_nodes;
+            SortedVec<RadixTrieNode<K, V> *> * top_nodes;
             RadixTrieNode<K, V> * curr_node;
             bool end;
 
@@ -36,7 +37,7 @@ namespace data {
 
             RadixTrieIterator();
  
-            RadixTrieIterator(std::vector<RadixTrieNode<K, V> *> * top_nodes, RadixTrieNode<K, V> * node, bool end);
+            RadixTrieIterator(SortedVec<RadixTrieNode<K, V> *> * top_nodes, RadixTrieNode<K, V> * node, bool end);
 
             RadixTrieIterator<K, V>& operator++();
 
@@ -67,7 +68,7 @@ data::RadixTrieIterator<K, V>::RadixTrieIterator() : top_nodes(nullptr), curr_no
 }
 
 template <typename K, typename V>
-data::RadixTrieIterator<K, V>::RadixTrieIterator(std::vector<RadixTrieNode<K, V> *> * top_nodes, RadixTrieNode<K, V> * node, bool end)
+data::RadixTrieIterator<K, V>::RadixTrieIterator(SortedVec<RadixTrieNode<K, V> *> * top_nodes, RadixTrieNode<K, V> * node, bool end)
     : top_nodes(top_nodes), curr_node(node), end(end) 
 {
     this->check_impl();
@@ -111,7 +112,7 @@ data::RadixTrieIterator<K, V> data::RadixTrieIterator<K, V>::operator++(int) {
 
 template <typename K, typename V>
 data::RadixTrieNode<K, V> * data::RadixTrieIterator<K, V>::next_node_up(RadixTrieNode<K, V> * node) {
-    std::vector<RadixTrieNode<K, V> *> * siblings;
+    SortedVec<RadixTrieNode<K, V> *> * siblings;
 
     if (node->parent) {
         siblings = &node->parent->children;

@@ -4,6 +4,7 @@
 #include "../include/utils.h"
 #include "../../include/structures/radix_trie.h"
 #include "../../include/structures/radix_trie_iterator.h"
+#include "../../include/structures/sorted_vec.h"
 
 namespace {
     typedef std::pair<std::vector<char>, const int *> ro_value_type;
@@ -146,7 +147,7 @@ void radix_trie_tests() {
         expect(r_trie.del(c_str_to_vec("fastest")) == 2);
         expect(r_trie.del(c_str_to_vec("faster")) == 1);
  
-        std::vector<data::RadixTrieNode<char, int> *> &nodes = r_trie.get_nodes();
+        data::SortedVec<data::RadixTrieNode<char, int> *> &nodes = r_trie.get_nodes();
         expect(nodes.size() == 1);
         expect(nodes[0]->key == c_str_to_vec("fastestest"));
         expect(nodes[0]->val == 4);
