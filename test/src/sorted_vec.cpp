@@ -45,7 +45,7 @@ void sorted_vec_tests() {
 
         for (int i = vec.size() - 1; i >= 0; i--) {
             expect(vec.del(i) == exp_vec[i]);
-            expect(vec.size() == i);
+            expect(vec.size() == (size_t) i);
         }
     };
 
@@ -212,11 +212,24 @@ void sorted_vec_tests() {
         expect(copy_assigned.size() == move_constructed.size());
         expect(move_constructed.size() == move_assigned.size());
 
-        for(size_t i = 0; i < vec.size(); i++) {
+        for(size_t i = 0; i < vec3.size(); i++) {
             expect(vec3[i] == copy_constructed[i]);
             expect(copy_constructed[i] == copy_assigned[i]);
             expect(copy_assigned[i] == move_constructed[i]);
             expect(move_constructed[i] == move_assigned[i]);
+        }
+    };
+
+    data::test::tests["sorted vec"]["is sorted"] = []() {
+        data::SortedVec<int> vec;
+
+        for (size_t i = 0; i < 1000; i++) {
+            vec.put(rand() % 1000);
+            expect(vec.size() == i + 1);
+        }
+
+        for (size_t i = 0; i < 999; i++) {
+            expect(vec[i] <= vec[i + 1]);
         }
     };
 }

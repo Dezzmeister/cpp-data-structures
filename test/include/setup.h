@@ -7,6 +7,8 @@
 extern void trie_tests();
 extern void radix_trie_tests();
 extern void sorted_vec_tests();
+extern void sorted_array_tests();
+extern void btree_tests();
 
 void setup_tests() {
     srand(time(NULL));
@@ -14,6 +16,8 @@ void setup_tests() {
     trie_tests();
     radix_trie_tests();
     sorted_vec_tests();
+    sorted_array_tests();
+    btree_tests();
 }
 
 #endif

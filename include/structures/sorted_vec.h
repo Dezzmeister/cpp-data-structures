@@ -2,11 +2,20 @@
 #define INCLUDE_STRUCTURES_SORTED_VEC_H
 
 #include <algorithm>
+
+#ifdef TEST
 #include <vector>
+#endif
 
 #include "../traits.h"
 
 namespace data {
+    /**
+     * A sorted vector with variable capacity. The vector grows when the number of elements reaches
+     * 2/3 of its capacity. NB: The vector does not shrink on its own - you have to call `shrink()`.
+     * 
+     * See SortedArray for an implementation of a sorted array with a fixed size.
+     */
     template <PartialOrd T>
     class SortedVec {
         private:
@@ -17,7 +26,7 @@ namespace data {
 
             /**
              * Moving a sorted vec consists of freeing the target's items and copying the
-             * items pointer to the target. To prevent double freeing, items is set to null in
+             * items pointer to the target. To prevent double freeing, `items` is set to null in
              * the source object. Moving a vector does not invalidate it, so the vector needs
              * to be able to recreate its items array if necessary.
              */
@@ -42,6 +51,10 @@ namespace data {
 
             size_t cap() const;
 
+            /**
+             * Returns the position of the first element in the vector that is not less than `item`
+             * (i.e., the first element that is greater than or equal to `item`).
+             */
             size_t lower_bound(const T &item) const;
 
             void put(const T item);
@@ -59,7 +72,7 @@ namespace data {
 
             void shrink();
 
-            bool operator==(const SortedVec<T> &other) const;
+            bool operator==(const SortedVec<T> &other) const requires Eq<T>;
 
 #ifdef TEST
             void append_unsorted(const T item);
@@ -246,9 +259,7 @@ void data::SortedVec<T>::shrink() {
 }
 
 template <data::PartialOrd T>
-bool data::SortedVec<T>::operator==(const SortedVec<T> &other) const {
-    static_assert(Eq<T>);
-
+bool data::SortedVec<T>::operator==(const SortedVec<T> &other) const requires data::Eq<T> {
     if (this->len != other.len) {
         return false;
     }
