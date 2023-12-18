@@ -21,7 +21,7 @@ namespace data {
         friend class SortedArray;
 
         private:
-            T items[N] = {0};
+            T items[N];
             size_t len;
 
         public:
@@ -43,7 +43,10 @@ namespace data {
              */
             size_t lower_bound(const T &item) const;
 
-            void put(const T item);
+            /**
+             * Puts an item into the array and returns the index it was inserted at.
+             */
+            size_t put(const T item);
 
             const T& operator[](size_t i) const;
 
@@ -137,7 +140,7 @@ size_t data::SortedArray<T, N>::lower_bound(const T &item) const {
 }
 
 template <data::PartialOrd T, const size_t N>
-void data::SortedArray<T, N>::put(const T item) {
+size_t data::SortedArray<T, N>::put(const T item) {
     if (this->len == N) {
         throw "Out of memory";
     }
@@ -150,6 +153,8 @@ void data::SortedArray<T, N>::put(const T item) {
 
     this->items[index] = item;
     this->len++;
+
+    return index;
 }
 
 template <data::PartialOrd T, const size_t N>

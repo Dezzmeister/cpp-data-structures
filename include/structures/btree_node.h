@@ -37,7 +37,7 @@ namespace data {
 
         BTreeEntry(K key, V val, BTreeNode<K, V, N> * pre = nullptr);
 
-        bool operator<(const BTreeEntry<K, V, N>  &other) const;
+        bool operator<(const BTreeEntry<K, V, N> &other) const;
     };
 
     template <PartialOrd K, typename V, const size_t N>

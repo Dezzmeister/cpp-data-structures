@@ -13,6 +13,9 @@ namespace data {
     concept Eq = requires(T a) {
         { a == a } -> std::convertible_to<bool>;
     };
+
+    template <typename T>
+    concept Ord = PartialOrd<T> && Eq<T>;
 }
 
 #endif

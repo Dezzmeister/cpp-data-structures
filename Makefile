@@ -54,13 +54,13 @@ release: ${OBJS}
 	${CXX} -o $@ $^ ${CXXFLAGS}
 
 test: ${OBJS_NO_MAIN} ${TEST_OBJS}
-	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
+	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ${PATTERN} ; rm -f ./${TEST_BINARY}
 
 memtest: ${OBJS_NO_MAIN} ${TEST_OBJS}
-	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && valgrind --track-origins=yes --leak-check=full ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
+	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && valgrind --track-origins=yes --leak-check=full ./${TEST_BINARY} ${PATTERN} ; rm -f ./${TEST_BINARY}
 
 invtest: ${OBJS_NO_MAIN} ${TEST_OBJS}
-	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ; rm -f ./${TEST_BINARY}
+	${CXX} -o ${TEST_BINARY} $^ ${CXXFLAGS} && ./${TEST_BINARY} ${PATTERN} ; rm -f ./${TEST_BINARY}
 
 %.o: %.cpp ${HEADERS} ${TEST_HEADERS}
 	${CXX} -c -o $@ $< ${CXXFLAGS}
